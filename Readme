@@ -1,0 +1,56 @@
+创建一个service继承MqttService（注册单中记得添加这个服务）
+
+具体例子如下：
+
+public class MyService extends MqttService{
+    private static String host="tcp://114.155.142.170:1883";         //服务器地址
+    private static String userName="JiZi";     //用户名
+    private static String password="JiZi";     //用户密码
+    private static String clientId;            //客户端id
+    private static final String TAG="MyService";
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        clientId= InfoUtil.getPackageName()+"_"+InfoUtil.getUniqueId();
+        MqttUtil.getInstance().initMqtt(host,userName,password,clientId,this);
+        MqttUtil.getInstance().addTopic("13396599965_D183C60A006F0D00_D183C60A006F0D00");
+        Log.e(TAG,"服务启动成功");
+    }
+
+    @Override
+    public void connectionLost(Throwable throwable) {
+        super.connectionLost(throwable);
+        Log.e(TAG,"连接丢失");
+    }
+
+    @Override
+    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+        super.messageArrived(s, mqttMessage);
+        Log.e(TAG,"接收数据   主题："+s+" ---> "+mqttMessage.toString());
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+        super.deliveryComplete(iMqttDeliveryToken);
+        Log.e(TAG,"发送数据成功："+ iMqttDeliveryToken.isComplete());
+    }
+
+    @Override
+    public void success() {
+        super.success();
+        Log.e(TAG,"连接成功");
+    }
+
+    @Override
+    public void failed() {
+        super.failed();
+        Log.e(TAG,"连接失败,正在重新连接中...");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG,"服务停止");
+    }
+}
